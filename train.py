@@ -16,13 +16,13 @@ gamma = 0.1
 
 num_epoches = 101
 step_size = 120
-batch_size = 4
+batch_size = 8
 ##########   DATASET   ###########
 normalizer = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 transform = transforms.Compose([ transforms.ToTensor(),  normalizer, ])
 
 img_dir = '../datasets/mars/bbox_train/'
-train_dataset = dataset.videodataset(dataset_dir=img_dir, txt_path='list_train_seq.txt', new_height=256, new_width=128, frames=16, transform=transform)
+train_dataset = dataset.videodataset(dataset_dir=img_dir, txt_path="../datasets/mars/train_ids.txt", new_height=256, new_width=128, frames=16, transform=transform)
 train_loader = torch.utils.data.DataLoader(dataset = train_dataset, batch_size = batch_size, shuffle = True, num_workers = 4)
 
 # down from https://download.pytorch.org/models/resnet50-19c8e357.pth
