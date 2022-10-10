@@ -14,7 +14,7 @@ class videodataset(data.Dataset):
 		with open(txt_path) as f:
 			line = f.readlines()
 			self.img_list = [os.path.join(dataset_dir, i.split()[0])+'*' for i in line]
-			self.label_list = [int(i.split()[1]) for i in line]
+			self.label_list = [int(i.split("/")[0]) for i in line]
 
 	def __getitem__(self, index):
 		im_dir = self.img_list[index]

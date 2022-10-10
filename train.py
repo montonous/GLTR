@@ -6,26 +6,27 @@ import numpy as np
 from torchvision import transforms
 import resnet
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "9"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "9"
+os.environ["CUDA_LAUNCH_BLOCKING"]="1"
 ###########   HYPER   ###########
 base_lr = 0.01
 momentum = 0.9
 weight_decay = 5e-4
 gamma = 0.1
 
-num_epoches = 501
+num_epoches = 101
 step_size = 120
-batch_size = 10
+batch_size = 4
 ##########   DATASET   ###########
 normalizer = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 transform = transforms.Compose([ transforms.ToTensor(),  normalizer, ])
 
-img_dir = 'video_dataset/Mars/bbox_train/'
+img_dir = '../datasets/mars/bbox_train/'
 train_dataset = dataset.videodataset(dataset_dir=img_dir, txt_path='list_train_seq.txt', new_height=256, new_width=128, frames=16, transform=transform)
 train_loader = torch.utils.data.DataLoader(dataset = train_dataset, batch_size = batch_size, shuffle = True, num_workers = 4)
 
 # down from https://download.pytorch.org/models/resnet50-19c8e357.pth
-model, new_param = resnet.resnet50(pretrained='rresnet50-19c8e357.pth', num_classes=625, train=True)
+model, new_param = resnet.resnet50(pretrained='../resnet50-19c8e357.pth', num_classes=1500, train=True)
 model.cuda()
 criterion = nn.CrossEntropyLoss()
 
@@ -57,7 +58,7 @@ for epoch in range(num_epoches):
 		images, label = data
 		images = torch.transpose(images, 1, 2)
 		images = Variable(images).cuda()
-		images = images.view(images.size(0)*images.size(1), images.size(2), images.size(3), images.size(4))
+		images = torch.reshape(images, (images.size(0)*images.size(1), images.size(2), images.size(3), images.size(4)))
 		label = Variable(label).cuda()
 		out = model(images)
 		#break
@@ -72,7 +73,7 @@ for epoch in range(num_epoches):
 		loss.backward()
 		optimizer.step()
 		
-		if i % 200 == 0:
+		if i % 50 == 0:
 			print('[{}/{}] iter: {}/{}. lr: {} . Loss: {:.6f}, Acc: {:.6f} time:{:.1f} s'.format(epoch+1, num_epoches, i, len(train_loader), lr, running_loss/(batch_size*i), running_acc/(batch_size*i), time.time() - since))
 			since = time.time()
 	print('[{}/{}] iter: {}/{}. lr: {} . Loss: {:.6f}, Acc: {:.6f}'.format(epoch+1, num_epoches, i, len(train_loader), lr, running_loss/(batch_size*i), running_acc/(batch_size*i)))

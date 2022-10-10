@@ -81,7 +81,7 @@ class ResNet(nn.Module):
 				m.bias.data.zero_()
 			elif isinstance(m, nn.Linear):
 				init.normal_(m.weight, std=0.001)
-	 			init.constant_(m.bias, 0)
+				init.constant_(m.bias, 0)
 
 		init.kaiming_normal_(self.feat.weight, mode='fan_out')
 		init.constant_(self.feat.bias, 0)
@@ -128,9 +128,9 @@ class ResNet(nn.Module):
 		x = self.layer4(x)
 
 		x = self.avgpool(x)
-		x = x.view(x.size(0), -1)
+		x = torch.reshape(x,(x.size(0), -1))
 		x = self.feat(x)
-		x = x.view(x.size(0)/self.frames, self.frames, -1)
+		x = torch.reshape(x, (int(x.size(0)/self.frames), self.frames, -1))
 
 		x0 = torch.transpose(x, 1, 2)
 		x = x.unsqueeze(dim=1)
@@ -160,17 +160,17 @@ def resnet50(pretrained='True', num_classes=1000, train=True):
 	static = model.state_dict()
 	for name, param in weight.items():
 		if name not in static:
-			print 'not load weight ', name
+			print('not load weight ', name)
 			continue
 		if isinstance(param, nn.Parameter):
-			print 'load weight ', name, type(param)
+			print('load weight ', name, type(param))
 			param = param.data
 			static[name].copy_(param)
 	#model.load_state_dict(weight)
 	new_param = []
 	for name, param in static.items():
 		if name not in weight:
-			print 'new param ', name
+			print('new param ', name)
 			new_param.append(name)			
 	#model.load_state_dict(weight)
 	return model, new_param
