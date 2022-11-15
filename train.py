@@ -14,15 +14,15 @@ momentum = 0.9
 weight_decay = 5e-4
 gamma = 0.1
 
-num_epoches = 101
-step_size = 120
-batch_size = 4
+num_epoches = 501
+step_size = 40
+batch_size = 7
 ##########   DATASET   ###########
 normalizer = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 transform = transforms.Compose([ transforms.ToTensor(),  normalizer, ])
 
 img_dir = '../datasets/mars/bbox_train/'
-train_dataset = dataset.videodataset(dataset_dir=img_dir, txt_path='list_train_seq.txt', new_height=256, new_width=128, frames=16, transform=transform)
+train_dataset = dataset.videodataset(dataset_dir=img_dir, txt_path="../datasets/mars/train_ids.txt", new_height=256, new_width=128, frames=16, transform=transform)
 train_loader = torch.utils.data.DataLoader(dataset = train_dataset, batch_size = batch_size, shuffle = True, num_workers = 4)
 
 # down from https://download.pytorch.org/models/resnet50-19c8e357.pth
@@ -82,4 +82,4 @@ for epoch in range(num_epoches):
 	print('Time:{:.1f} s'.format(time.time() - start))
 
 	if (epoch+1)%50 == 0:
-		torch.save(model.state_dict(), 'weight/resnet50_mars_%05d.pth'%(epoch))
+		torch.save(model.state_dict(), 'resnet50_mars_%05d.pth'%(epoch))

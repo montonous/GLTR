@@ -128,7 +128,7 @@ class ResNet(nn.Module):
 		x = self.layer4(x)
 
 		x = self.avgpool(x)
-		x = torch.reshape(x,(x.size(0), -1))
+		x = x.reshape(x.shape[0], -1)
 		x = self.feat(x)
 		x = torch.reshape(x, (int(x.size(0)/self.frames), self.frames, -1))
 
